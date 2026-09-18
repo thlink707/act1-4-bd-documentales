@@ -33,7 +33,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             (autor, titulo, revista, anio, volumen, paginas, idioma, clasificacion, palabras_clave, resumen) 
             VALUES 
             (:autor, :titulo, :revista, :anio, :volumen, :paginas, :idioma, :clasificacion, :palabras_clave, :resumen)");
+    if (!preg_match('/^[\p{L}\s\.\'\-&]+$/u', $autor)) {
+        $errores[] = "El autor no debe contener números ni símbolos raros.";
+    }
 
+    if ($clasificacion !== '' && preg_match('/[0-9]/', $clasificacion)) {
+        $errores[] = "La clasificación no debe contener números.";
+    }
+
+    if ($palabras_clave !== '' && preg_match('/[0-9]/', $palabras_clave)) {
+        $errores[] = "Las palabras clave no deben contener números.";
+    }
         $stmt->execute([
             'autor' => $autor,
             'titulo' => $titulo,
@@ -94,7 +104,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <form method="POST" action="agregar.php" class="mt-4">
       <div class="mb-3">
         <label class="form-label">Autor</label>
-        <input type="text" class="form-control" name="autor" required>
+        <input type="text" class="form-control" name="autor" required
+            pattern="[A-Za-zÀ-ÖØ-öø-ÿ\s\.\'\-&]+"
+            title= "Solo letras y espacios">
       </div>
       <div class="mb-3">
         <label class="form-label">Título</label>
@@ -118,15 +130,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       </div>
       <div class="mb-3">
         <label class="form-label">Idioma</label>
-        <input type="text" class="form-control" name="idioma">
+        <input type="text" class="form-control" name="idioma"
+             pattern="[^0-9]*"
+            title="No debe contener numeros">
       </div>
       <div class="mb-3">
         <label class="form-label">Clasificación</label>
-        <input type="text" class="form-control" name="clasificacion" placeholder="tema central del documento">
+        <input type="text" class="form-control" name="clasificacion" placeholder="tema central del documento"
+            pattern="[^0-9]*"
+            title="No debe contener numeros">
       </div>
       <div class="mb-3">
         <label class="form-label">Palabras clave</label>
-        <input type="text" class="form-control" name="palabras_clave" placeholder="separadas por comas">
+        <input type="text" class="form-control" name="palabras_clave" placeholder="separadas por comas"
+            pattern="[^0-9]*"
+            title="No debe contener numeros">
       </div>
       <div class="mb-3">
         <label class="form-label">Resumen</label>
